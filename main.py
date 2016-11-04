@@ -40,10 +40,14 @@ communitys_yungching = {'四季紅':'10522', 'MOC移動光城':'11461', '悅桂�
               '大同明日世界':'10816', '長虹菁英':'26630', '康寧城堡':'6825', '民權湖觀':'6892',
               '夆典百富':'10941', '湖水裔':'11370', '清歡':'12460'}
 
+communitys_test = {'長虹菁英':'26630'}
+
 houseAgents = {'sinyi':communitys_sinyi, 'yungching':communitys_yungching}
+houseAgents_test = {'yungching':communitys_test}
+
 
 #http://tradeinfo.sinyi.com.tw/community/communityDetail.html?c=0006926&p=1&s2=10311_10510&s4=1&s5=2
-#https://community.yungching.com.tw/Building/27444
+#https://community.yungching.com.tw/Building/26630
 
 def housePrice_sinyi(communitys):
     for name, community in communitys.items():
@@ -72,15 +76,16 @@ def housePrice_yungching(communitys):
         soup = BeautifulSoup(response.text, "lxml")
         print("抓取永慶 ====%s==== 實價登錄" % name)
         table = soup.find("table", attrs={"class": "tbl-price-trend"})
-        tds = table.findAll("td")
+        trs = table.findAll("tr")
         ths = table.findAll("th")
-        count = 1
+        count = 0
         filename = name + '.txt'
         file = open(filename, mode='w')
-        for x in tds:
+
+        for tr in trs:
             file.write("#%d:\n" % count)
             #print("#%d:" % count)
-            for td, th in zip(tds, ths):
+            for th, td in zip(ths, tr.findAll("td")):
                 file.write(th.text.strip() + ':' + td.text.strip() + '\n')
                 #print(th.text.strip() + ":" + td.text.strip())
             count += 1
@@ -96,5 +101,6 @@ try:
             housePrice_yungching(communitys)
         else:
             print('No such House Agent')
+    print("Finished !!")
 except:
     print('get web error')
