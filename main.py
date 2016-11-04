@@ -40,10 +40,10 @@ communitys_yungching = {'四季紅':'10522', 'MOC移動光城':'11461', '悅桂�
               '大同明日世界':'10816', '長虹菁英':'26630', '康寧城堡':'6825', '民權湖觀':'6892',
               '夆典百富':'10941', '湖水裔':'11370', '清歡':'12460'}
 
-communitys_test = {'長虹菁英':'26630'}
+communitys_test = {'MOC移動光城':'11461'}
 
 houseAgents = {'sinyi':communitys_sinyi, 'yungching':communitys_yungching}
-houseAgents_test = {'yungching':communitys_test}
+#houseAgents_test = {'yungching':communitys_test}
 
 
 #http://tradeinfo.sinyi.com.tw/community/communityDetail.html?c=0006926&p=1&s2=10311_10510&s4=1&s5=2
@@ -77,7 +77,7 @@ def housePrice_yungching(communitys):
         print("抓取永慶 ====%s==== 實價登錄" % name)
         table = soup.find("table", attrs={"class": "tbl-price-trend"})
         trs = table.findAll("tr")
-        ths = table.findAll("th")
+        ths = trs[0].findAll("th")
         count = 0
         filename = name + '.txt'
         file = open(filename, mode='w')
@@ -95,6 +95,7 @@ def housePrice_yungching(communitys):
 
 try:
     for agent, communitys in houseAgents.items():
+    #for agent, communitys in houseAgents_test.items():
         if agent == 'sinyi':
             housePrice_sinyi(communitys)
         elif agent == 'yungching':
