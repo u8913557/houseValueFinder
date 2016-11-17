@@ -48,76 +48,96 @@ houseAgents = {'sinyi':communitys_sinyi, 'yungching':communitys_yungching}
 
 #http://tradeinfo.sinyi.com.tw/community/communityDetail.html?c=0006926&p=1&s2=10311_10510&s4=1&s5=2
 #https://community.yungching.com.tw/Building/26630
+
+#==============================================
+def getwebcontent(url, header):
+    try:
+        res = requests.get(url, headers=header, timeout=1000)
+    except requests.exceptions.RequestException as e:
+        print(e)
+        return None
+
+    return res
+
+def parsewebcontent(content, xml_format):
+    try:
+        soup = BeautifulSoup(content, xml_format)
+    except AttributeError as e:
+        print("BeautifulSoup error:" + e)
+        return None
+    return soup
+
 #==============================================
 def housePrice_sinyi(communitys):
     for name, community in communitys.items():
         query_data = {'c': community, 'p': '1', 's2': duration, 's4': '1', 's5': '2'}
         url_data = urllib.parse.urlencode(query_data)
         url = 'http://tradeinfo.sinyi.com.tw/community/communityDetail.html?' + url_data
-
-        try:
-            response = requests.get(url, headers=headers, timeout=1000)
-        except requests.exceptions.RequestException as e:
-            print(e)
+        print("抓取信義 ====%s==== 實價登錄" % name)
+        response = getwebcontent(url, headers)
+        if response is None:
+            print("get 信義 Web Site Error")
+            continue
         else:
             response.encoding = 'utf-8'
 
-            try:
-                soup = BeautifulSoup(response.text, "lxml")
-            except AttributeError as e:
-                print("BeautifulSoup error:" + e)
-                continue
-
-            sleep(1)
-            print("抓取信義 ====%s==== 實價登錄" % name)
-            #print(soup.select('#tradetable_img'))
-            if len(soup.select('#tradetable_img')) is 0:
-                print("%s is empty" % name)
+            soup = parsewebcontent(response.text, "lxml")
+            if soup is None:
+                print("Parse 信義 Web Site Error")
                 continue
             else:
-                #print(soup.select('#tradetable_img')[0].get('src'))
-                tradetable_src = 'http://tradeinfo.sinyi.com.tw' + soup.select('#tradetable_img')[0].get('src')
-                #print(tradetable_src)
-                response = requests.get(tradetable_src, headers=headers, timeout=1000)
-                img = Image.open(BytesIO(response.content))
-                img.save(name + '_' + duration + '.png', 'PNG')
-                # img.show()
-        sleep(1)
+                #print(soup.select('#tradetable_img'))
+                if len(soup.select('#tradetable_img')) is 0:
+                    print("信義: %s is empty" % name)
+                    continue
+                else:
+                    #print(soup.select('#tradetable_img')[0].get('src'))
+                    tradetable_src = 'http://tradeinfo.sinyi.com.tw' + soup.select('#tradetable_img')[0].get('src')
+                    #print(tradetable_src)
+                    sleep(1)
+                    response = getwebcontent(tradetable_src, headers)
+                    if response is None:
+                        print("get 信義 Web Site 2 Error")
+                        continue
+                    else:
+                        img = Image.open(BytesIO(response.content))
+                        img.save(name + '_' + duration + '.png', 'PNG')
+                        # img.show()
+    sleep(1)
 #===============================
 def housePrice_yungching(communitys):
     for name, community in communitys.items():
         url = 'https://community.yungching.com.tw/Building/' + community
-        try:
-            response = requests.get(url, headers=headers, timeout=1000)
-        except requests.exceptions.RequestException as e:
-            print(e)
-
         print("抓取永慶 ====%s==== 實價登錄" % name)
-        response.encoding = 'utf-8'
-
-        try:
-            soup = BeautifulSoup(response.text, "lxml")
-        except AttributeError as e:
-            print("BeautifulSoup error:" + e)
+        response = getwebcontent(url, headers)
+        if response is None:
+            print("get 永慶 Web Site Error")
             continue
+        else:
+            response.encoding = 'utf-8'
 
-        table = soup.find("table", attrs={"class": "tbl-price-trend"})
-        trs = table.findAll("tr")
-        ths = trs[0].findAll("th")
-        count = 0
-        filename = name + '.txt'
-        file = open(filename, mode='w')
+            soup = parsewebcontent(response.text, "lxml")
+            if soup is None:
+                print("Parse 永慶 Web Site Error")
+                continue
+            else:
+                table = soup.find("table", attrs={"class": "tbl-price-trend"})
+                trs = table.findAll("tr")
+                ths = trs[0].findAll("th")
+                count = 0
+                filename = name + '.txt'
+                file = open(filename, mode='w')
 
-        for tr in trs:
-            file.write("#%d:\n" % count)
-            #print("#%d:" % count)
-            for th, td in zip(ths, tr.findAll("td")):
-                file.write(th.text.strip() + ':' + td.text.strip() + '\n')
-                #print(th.text.strip() + ":" + td.text.strip())
-            count += 1
-            file.write('\n')
-        file.close()
-        sleep(1)
+                for tr in trs:
+                    file.write("#%d:\n" % count)
+                    #print("#%d:" % count)
+                    for th, td in zip(ths, tr.findAll("td")):
+                        file.write(th.text.strip() + ':' + td.text.strip() + '\n')
+                        #print(th.text.strip() + ":" + td.text.strip())
+                    count += 1
+                    file.write('\n')
+                file.close()
+    sleep(1)
 #=========================
 
 for agent, communitys in houseAgents.items():
