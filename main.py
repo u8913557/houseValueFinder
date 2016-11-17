@@ -48,7 +48,7 @@ houseAgents = {'sinyi':communitys_sinyi, 'yungching':communitys_yungching}
 
 #http://tradeinfo.sinyi.com.tw/community/communityDetail.html?c=0006926&p=1&s2=10311_10510&s4=1&s5=2
 #https://community.yungching.com.tw/Building/26630
-
+#==============================================
 def housePrice_sinyi(communitys):
     for name, community in communitys.items():
         query_data = {'c': community, 'p': '1', 's2': duration, 's4': '1', 's5': '2'}
@@ -61,7 +61,12 @@ def housePrice_sinyi(communitys):
             print(e)
         else:
             response.encoding = 'utf-8'
-            soup = BeautifulSoup(response.text, "lxml")
+
+            try:
+                soup = BeautifulSoup(response.text, "lxml")
+            except AttributeError as e:
+                print("BeautifulSoup error:" + e)
+                continue
 
             sleep(1)
             print("抓取信義 ====%s==== 實價登錄" % name)
@@ -78,7 +83,7 @@ def housePrice_sinyi(communitys):
                 img.save(name + '_' + duration + '.png', 'PNG')
                 # img.show()
         sleep(1)
-
+#===============================
 def housePrice_yungching(communitys):
     for name, community in communitys.items():
         url = 'https://community.yungching.com.tw/Building/' + community
@@ -86,28 +91,34 @@ def housePrice_yungching(communitys):
             response = requests.get(url, headers=headers, timeout=1000)
         except requests.exceptions.RequestException as e:
             print(e)
-        else:
-            print("抓取永慶 ====%s==== 實價登錄" % name)
-            response.encoding = 'utf-8'
+
+        print("抓取永慶 ====%s==== 實價登錄" % name)
+        response.encoding = 'utf-8'
+
+        try:
             soup = BeautifulSoup(response.text, "lxml")
-            table = soup.find("table", attrs={"class": "tbl-price-trend"})
-            trs = table.findAll("tr")
-            ths = trs[0].findAll("th")
-            count = 0
-            filename = name + '.txt'
-            file = open(filename, mode='w')
+        except AttributeError as e:
+            print("BeautifulSoup error:" + e)
+            continue
 
-            for tr in trs:
-                file.write("#%d:\n" % count)
-                #print("#%d:" % count)
-                for th, td in zip(ths, tr.findAll("td")):
-                    file.write(th.text.strip() + ':' + td.text.strip() + '\n')
-                    #print(th.text.strip() + ":" + td.text.strip())
-                count += 1
-                file.write('\n')
-            file.close()
-            sleep(1)
+        table = soup.find("table", attrs={"class": "tbl-price-trend"})
+        trs = table.findAll("tr")
+        ths = trs[0].findAll("th")
+        count = 0
+        filename = name + '.txt'
+        file = open(filename, mode='w')
 
+        for tr in trs:
+            file.write("#%d:\n" % count)
+            #print("#%d:" % count)
+            for th, td in zip(ths, tr.findAll("td")):
+                file.write(th.text.strip() + ':' + td.text.strip() + '\n')
+                #print(th.text.strip() + ":" + td.text.strip())
+            count += 1
+            file.write('\n')
+        file.close()
+        sleep(1)
+#=========================
 
 for agent, communitys in houseAgents.items():
 #for agent, communitys in houseAgents_test.items():
