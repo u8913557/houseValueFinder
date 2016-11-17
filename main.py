@@ -54,54 +54,69 @@ def housePrice_sinyi(communitys):
         query_data = {'c': community, 'p': '1', 's2': duration, 's4': '1', 's5': '2'}
         url_data = urllib.parse.urlencode(query_data)
         url = 'http://tradeinfo.sinyi.com.tw/community/communityDetail.html?' + url_data
-        response = requests.get(url, headers=headers, timeout=1000)
-        response.encoding = 'utf-8'
-        soup = BeautifulSoup(response.text, "lxml")
 
-        sleep(1)
-        tradetable_src = 'http://tradeinfo.sinyi.com.tw' + soup.select('#tradetable_img')[0].get('src')
-        #print(tradetable_src)
-        print("抓取信義 ====%s==== 實價登錄" % name)
-        response = requests.get(tradetable_src, headers=headers, timeout=1000)
-        img = Image.open(BytesIO(response.content))
-        img.save(name + '_' + duration + '.png', 'PNG')
-        # img.show()
+        try:
+            response = requests.get(url, headers=headers, timeout=1000)
+        except requests.exceptions.RequestException as e:
+            print(e)
+        else:
+            response.encoding = 'utf-8'
+            soup = BeautifulSoup(response.text, "lxml")
+
+            sleep(1)
+            print("抓取信義 ====%s==== 實價登錄" % name)
+            #print(soup.select('#tradetable_img'))
+            if len(soup.select('#tradetable_img')) is 0:
+                print("%s is empty" % name)
+                continue
+            else:
+                #print(soup.select('#tradetable_img')[0].get('src'))
+                tradetable_src = 'http://tradeinfo.sinyi.com.tw' + soup.select('#tradetable_img')[0].get('src')
+                #print(tradetable_src)
+                response = requests.get(tradetable_src, headers=headers, timeout=1000)
+                img = Image.open(BytesIO(response.content))
+                img.save(name + '_' + duration + '.png', 'PNG')
+                # img.show()
         sleep(1)
 
 def housePrice_yungching(communitys):
     for name, community in communitys.items():
         url = 'https://community.yungching.com.tw/Building/' + community
-        response = requests.get(url, headers=headers, timeout=1000)
-        response.encoding = 'utf-8'
-        soup = BeautifulSoup(response.text, "lxml")
-        print("抓取永慶 ====%s==== 實價登錄" % name)
-        table = soup.find("table", attrs={"class": "tbl-price-trend"})
-        trs = table.findAll("tr")
-        ths = trs[0].findAll("th")
-        count = 0
-        filename = name + '.txt'
-        file = open(filename, mode='w')
-
-        for tr in trs:
-            file.write("#%d:\n" % count)
-            #print("#%d:" % count)
-            for th, td in zip(ths, tr.findAll("td")):
-                file.write(th.text.strip() + ':' + td.text.strip() + '\n')
-                #print(th.text.strip() + ":" + td.text.strip())
-            count += 1
-            file.write('\n')
-        file.close()
-        sleep(1)
-
-try:
-    for agent, communitys in houseAgents.items():
-    #for agent, communitys in houseAgents_test.items():
-        if agent == 'sinyi':
-            housePrice_sinyi(communitys)
-        elif agent == 'yungching':
-            housePrice_yungching(communitys)
+        try:
+            response = requests.get(url, headers=headers, timeout=1000)
+        except requests.exceptions.RequestException as e:
+            print(e)
         else:
-            print('No such House Agent')
-    print("Finished !!")
-except:
-    print('get web error')
+            print("抓取永慶 ====%s==== 實價登錄" % name)
+            response.encoding = 'utf-8'
+            soup = BeautifulSoup(response.text, "lxml")
+            table = soup.find("table", attrs={"class": "tbl-price-trend"})
+            trs = table.findAll("tr")
+            ths = trs[0].findAll("th")
+            count = 0
+            filename = name + '.txt'
+            file = open(filename, mode='w')
+
+            for tr in trs:
+                file.write("#%d:\n" % count)
+                #print("#%d:" % count)
+                for th, td in zip(ths, tr.findAll("td")):
+                    file.write(th.text.strip() + ':' + td.text.strip() + '\n')
+                    #print(th.text.strip() + ":" + td.text.strip())
+                count += 1
+                file.write('\n')
+            file.close()
+            sleep(1)
+
+
+for agent, communitys in houseAgents.items():
+#for agent, communitys in houseAgents_test.items():
+    if agent == 'sinyi':
+        housePrice_sinyi(communitys)
+        #print("")
+    elif agent == 'yungching':
+        housePrice_yungching(communitys)
+        #print("")
+    else:
+        print('No such House Agent')
+print("Finished !!")
