@@ -127,11 +127,18 @@ def housePrice_yungching(communitys):
                 file = open(filename, mode='w')
 
                 for tr in trs:
-                    file.write("#%d:\n" % count)
-                    #print("#%d:" % count)
-                    for th, td in zip(ths, tr.findAll("td")):
-                        file.write(th.text.strip() + ':' + td.text.strip() + '\n')
-                        #print(th.text.strip() + ":" + td.text.strip())
+                    if count==0:
+                        count += 1
+                        continue
+                    else:
+                        file.write("#%d:\n" % count)
+                        print("#%d:" % count)
+                        for th, td in zip(ths, tr.findAll("td")):
+                            if tr.findAll("td") is not None:
+                                file.write(th.text.strip() + ':' + td.text.strip() + '\n')
+                                print(th.text.strip() + ":" + td.text.strip())
+                            else:
+                                continue
                     count += 1
                     file.write('\n')
                 file.close()
