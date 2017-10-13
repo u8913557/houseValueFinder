@@ -5,6 +5,7 @@ import urllib
 from PIL import Image
 from io import BytesIO
 from time import sleep
+import datetime
 
 user_agents = ['Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533+(KHTML, like Gecko) Element Browser 5.0',
                'IBM WebExplorer/v0.94, Galaxy/1.0 [en] (Mac OS X 10.5.6; U; en)',
@@ -17,7 +18,9 @@ Accepts = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*
 Accept_Languages = ['zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4,zh-CN;q=0.2,ja;q=0.2']
 Accept_Encodings = ['gzip, deflate, sdch']
 
-index = random.randrange(0, len(user_agents))
+random.seed(datetime.datetime.now())
+#index = random.randrange(0, len(user_agents))
+index = random.randint(0, len(user_agents)-1)
 user_agent = user_agents[index]
 Connection = Connections[0]
 Accept = Accepts[0]
