@@ -92,17 +92,16 @@ def housePrice_sinyi(communitys):
                 #print(soup.select('#tradetable_img'))
                 if len(soup.select('#tradetable_img')) is 0:
                     print("信義: %s is empty" % name)
+                    sleep(1)
                     continue
                 else:
                     #print(soup.select('#tradetable_img')[0].get('src'))
                     img_src = soup.select('#tradetable_img')[0].get('src')
                     tradetable_src = 'http://tradeinfo.sinyi.com.tw' + img_src
                     #print(tradetable_src)
-                    sleep(1)
-                    
-                    urlretrieve(tradetable_src, name + '.png')
-         
-    sleep(1)
+                    sleep(1)                    
+                    urlretrieve(tradetable_src, name + '.png')        
+    
 #===============================
 def housePrice_yungching(communitys):
     for name, community in communitys.items():
