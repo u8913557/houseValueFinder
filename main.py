@@ -100,7 +100,7 @@ def housePrice_sinyi(communitys):
                     tradetable_src = 'http://tradeinfo.sinyi.com.tw' + img_src
                     #print(tradetable_src)
                     sleep(1)                    
-                    urlretrieve(tradetable_src, name + '.png')        
+                    urllib.request.urlretrieve(tradetable_src, name + '.png')        
     
 #===============================
 def housePrice_yungching(communitys):
