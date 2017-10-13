@@ -2,8 +2,6 @@ import requests
 import random
 from bs4 import BeautifulSoup
 import urllib
-from PIL import Image
-from io import BytesIO
 from time import sleep
 import datetime
 
@@ -97,17 +95,13 @@ def housePrice_sinyi(communitys):
                     continue
                 else:
                     #print(soup.select('#tradetable_img')[0].get('src'))
-                    tradetable_src = 'http://tradeinfo.sinyi.com.tw' + soup.select('#tradetable_img')[0].get('src')
+                    img_src = soup.select('#tradetable_img')[0].get('src')
+                    tradetable_src = 'http://tradeinfo.sinyi.com.tw' + img_src
                     #print(tradetable_src)
                     sleep(1)
-                    response = getwebcontent(tradetable_src, headers)
-                    if response is None:
-                        print("get 信義 Web Site 2 Error")
-                        continue
-                    else:
-                        img = Image.open(BytesIO(response.content))
-                        img.save(name + '_' + duration + '.png', 'PNG')
-                        # img.show()
+                    
+                    urlretrieve(tradetable_src, name + '.png')
+         
     sleep(1)
 #===============================
 def housePrice_yungching(communitys):
