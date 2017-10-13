@@ -35,6 +35,7 @@ startDate_s2 = ['103', '11']
 stopDate_s2 = ['105', '10']
 duration = startDate_s2[0] + startDate_s2[1] + '_' + stopDate_s2[0] + stopDate_s2[1]
 
+#永慶
 communitys_yungching = {'四季紅':'10522', 'MOC移動光城':'11461', '悅桂冠':'9926', '經貿BOSS':'10701',
              '東方晶采':'26262', '風華':'10675', '風範':'11165', '翔譽之心':'26474',
               '大同明日世界':'10816', '長虹菁英':'26630', '康寧城堡':'6825', '民權湖觀':'6892',
@@ -56,7 +57,6 @@ def getwebcontent(url, header):
     except requests.exceptions.RequestException as e:
         print(e)
         return None
-
     return res
 
 def parsewebcontent(content, xml_format):
@@ -70,8 +70,10 @@ def parsewebcontent(content, xml_format):
 #==============================================
 def housePrice_sinyi(communitys):
     for name, community in communitys.items():
-        query_data = {'c': community, 'p': '1', 's2': duration, 's4': '1', 's5': '2'}
+        #query_data = {'c': community, 'p': '1', 's2': duration, 's4': '1', 's5': '2'}
+        query_data = {'c': community, 'p': '1', 's4': '1', 's5': '2'}
         url_data = urllib.parse.urlencode(query_data)
+        #print("url_data:" + url_data)
         url = 'http://tradeinfo.sinyi.com.tw/community/communityDetail.html?' + url_data
         print("抓取信義 ====%s==== 實價登錄" % name)
         response = getwebcontent(url, headers)
