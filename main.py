@@ -122,35 +122,42 @@ def housePrice_yungching(communitys):
             else:
                 table = soup.find("table", attrs={"class": "tbl-price-trend"})
                 trs = table.findAll("tr")
+                #print("trs:" + str(trs))
                 ths = trs[0].findAll("th")
-                count = 0
+                #print("ths:" + str(ths))
+                count = 1
                 #text format
                 filename = name + '.txt'
                 #csv format
                 csvfilename = name + '.csv'
                 file = open(filename, mode='w')
-                csvFile = open((csvfilename+".csv"), 'w+')
+                csvFile = open(csvfilename, 'w+')
                 writer = csv.writer(csvFile)
-
-                for tr in trs:
-                    if count==0:
-                        count += 1
-                        continue
-                    else:
-                        file.write("#%d:\n" % count)
-                        writer.writerow(str("#" + count))                    
-                        #print("#%d:" % count)
-                        for th, td in zip(ths, tr.findAll("td")):
-                            if tr.findAll("td") is not None:
+                
+                try:
+                    for tr in trs:
+                        #text
+                        #In trs, the first item is th so td cannot be found
+                        if tr.findAll("td"):
+                            file.write("#%d:\n" % count)  
+                            #print("#%d:" % count)   
+                            for th, td in zip(ths, tr.findAll("td")): 
+                                #print("th:" + th.text.strip() + '\n')
+                                #print("td:" + td.text.strip() + '\n')
                                 file.write(th.text.strip() + ':' + td.text.strip() + '\n')
-                                writer.writerow((th.text.strip(), td.text.strip()))
                                 #print(th.text.strip() + ":" + td.text.strip())
-                            else:
-                                continue
-                    count += 1
-                    file.write('\n')
-                file.close()
-                csvFile.close()
+                            count += 1
+                            file.write('\n')
+                       
+                        #csv
+                        csvRow = []
+                        for cell in tr.findAll(['td', 'th']):
+                            csvRow.append(cell.text.strip())
+                            #print("text:" + text.strip() + '\n')
+                        writer.writerow(csvRow)
+                finally:    
+                    file.close()
+                    csvFile.close()      
     sleep(1)
 #=========================
 
