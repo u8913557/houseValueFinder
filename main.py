@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import urllib
 from time import sleep
 import datetime
+import csv
 
 user_agents = ['Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533+(KHTML, like Gecko) Element Browser 5.0',
                'IBM WebExplorer/v0.94, Galaxy/1.0 [en] (Mac OS X 10.5.6; U; en)',
@@ -123,8 +124,13 @@ def housePrice_yungching(communitys):
                 trs = table.findAll("tr")
                 ths = trs[0].findAll("th")
                 count = 0
+                #text format
                 filename = name + '.txt'
+                #csv format
+                csvfilename = name + '.csv'
                 file = open(filename, mode='w')
+                csvFile = open((csvfilename+".csv"), 'w+')
+                writer = csv.writer(csvFile)
 
                 for tr in trs:
                     if count==0:
@@ -132,16 +138,19 @@ def housePrice_yungching(communitys):
                         continue
                     else:
                         file.write("#%d:\n" % count)
-                        print("#%d:" % count)
+                        writer.writerow(str("#" + count))                    
+                        #print("#%d:" % count)
                         for th, td in zip(ths, tr.findAll("td")):
                             if tr.findAll("td") is not None:
                                 file.write(th.text.strip() + ':' + td.text.strip() + '\n')
-                                print(th.text.strip() + ":" + td.text.strip())
+                                writer.writerow((th.text.strip(), td.text.strip()))
+                                #print(th.text.strip() + ":" + td.text.strip())
                             else:
                                 continue
                     count += 1
                     file.write('\n')
                 file.close()
+                csvFile.close()
     sleep(1)
 #=========================
 
