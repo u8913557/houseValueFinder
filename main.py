@@ -123,6 +123,7 @@ def housePrice_yungching(communitys):
                 table = soup.find("table", attrs={"class": "tbl-price-trend"})
                 trs = table.findAll("tr")
                 #print("trs:" + str(trs))
+                #Get Title tr/th
                 ths = trs[0].findAll("th")
                 #print("ths:" + str(ths))
                 count = 1
