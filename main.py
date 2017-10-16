@@ -126,7 +126,7 @@ def housePrice_yungching(communitys):
                     a_link = div_link.find("a")
                     #print("a_link:" + str(a_link))
                     if a_link is not None:
-                        link = a_link['href']
+                        link = a_link.attrs['href']
                         #print("link:" + str(link))
                         url = 'https:' + link
                 
