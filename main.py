@@ -38,10 +38,10 @@ stopDate_s2 = ['105', '10']
 duration = startDate_s2[0] + startDate_s2[1] + '_' + stopDate_s2[0] + stopDate_s2[1]
 
 #永慶
-communitys_yungching = {'四季紅':'10522', 'MOC移動光城':'11461', '悅桂冠':'9926', '經貿BOSS':'10701',
+communitys_yungching = {'四季紅':'10522', '文心移動光城':'11461', '悅桂冠':'9926', '經貿BOSS':'10701',
              '東方晶采':'26262', '風華':'10675', '風範':'11165', '翔譽之心':'26474',
               '大同明日世界':'10816', '長虹菁英':'26630', '康寧城堡':'6825', '民權湖觀':'6892',
-              '夆典百富':'10941', '湖水裔':'11370', '清歡':'12460'}
+              '夆典百富':'10941', '國礎湖水裔':'11370', '清歡':'12460'}
 
 communitys_test = {'MOC移動光城':'11461'}
 
@@ -106,15 +106,43 @@ def housePrice_sinyi(communitys):
 #===============================
 def housePrice_yungching(communitys):
     for name, community in communitys.items():
-        url = 'https://community.yungching.com.tw/Building/' + community
         print("抓取永慶 ====%s==== 實價登錄" % name)
+        #https://community.yungching.com.tw/region/台北市-_c-/?kw=國礎湖水裔
+        url = None
+        urlQuery = 'https://community.yungching.com.tw/region/台北市-_c-/?kw=' + name
+        response = getwebcontent(urlQuery, headers)
+        if response is None:
+            print("get 永慶 Query Web Site Error, try default ID")            
+        else:
+            response.encoding = 'utf-8'
+            soup = parsewebcontent(response.text, "lxml")
+            if soup is None:
+                print("Parse 永慶 Query Web Site Error, try default ID")  
+                
+            else:
+                div_link = soup.find("div", attrs={"class": "item-info"})
+                #print("div_link:" + str(div_link))
+                if div_link is not None:
+                    a_link = div_link.find("a")
+                    #print("a_link:" + str(a_link))
+                    if a_link is not None:
+                        link = a_link['href']
+                        #print("link:" + str(link))
+                        url = 'https:' + link
+                
+        sleep(1)            
+       
+        if url is None:
+            url = 'https://community.yungching.com.tw/Building/' + community
+            print("Use default community ID")
+           
+        #print("url:" + url)
         response = getwebcontent(url, headers)
         if response is None:
             print("get 永慶 Web Site Error")
             continue
         else:
             response.encoding = 'utf-8'
-
             soup = parsewebcontent(response.text, "lxml")
             if soup is None:
                 print("Parse 永慶 Web Site Error")
@@ -135,30 +163,30 @@ def housePrice_yungching(communitys):
                 csvFile = open(csvfilename, 'w+')
                 writer = csv.writer(csvFile)
                 
-                try:
-                    for tr in trs:
-                        #text
-                        #In trs, the first item is th so td cannot be found
-                        if tr.findAll("td"):
-                            file.write("#%d:\n" % count)  
-                            #print("#%d:" % count)   
-                            for th, td in zip(ths, tr.findAll("td")): 
-                                #print("th:" + th.text.strip() + '\n')
-                                #print("td:" + td.text.strip() + '\n')
-                                file.write(th.text.strip() + ':' + td.text.strip() + '\n')
-                                #print(th.text.strip() + ":" + td.text.strip())
-                            count += 1
-                            file.write('\n')
+            try:
+                for tr in trs:
+                    #text
+                    #In trs, the first item is th so td cannot be found
+                    if tr.findAll("td"):
+                        file.write("#%d:\n" % count)  
+                        #print("#%d:" % count)   
+                        for th, td in zip(ths, tr.findAll("td")): 
+                            #print("th:" + th.text.strip() + '\n')
+                            #print("td:" + td.text.strip() + '\n')
+                            file.write(th.text.strip() + ':' + td.text.strip() + '\n')
+                            #print(th.text.strip() + ":" + td.text.strip())
+                        count += 1
+                        file.write('\n')
                        
-                        #csv
-                        csvRow = []
-                        for cell in tr.findAll(['td', 'th']):
-                            csvRow.append(cell.text.strip())
-                            #print("text:" + text.strip() + '\n')
-                        writer.writerow(csvRow)
-                finally:    
-                    file.close()
-                    csvFile.close()      
+                    #csv
+                    csvRow = []
+                    for cell in tr.findAll(['td', 'th']):
+                        csvRow.append(cell.text.strip())
+                        #print("text:" + text.strip() + '\n')
+                    writer.writerow(csvRow)
+            finally:    
+                file.close()
+                csvFile.close()      
     sleep(1)
 #=========================
 
