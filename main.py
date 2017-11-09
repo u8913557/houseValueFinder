@@ -29,10 +29,10 @@ headers = {'user-agent':user_agent, 'Connection':Connection, 'Accept':Accept,
            'Accept_Language':Accept_Language, 'Accept-Encoding':Accept_Encoding}
 
 #信義房屋
-communitys_sinyi = {'四季紅':'0009238', 'MOC移動光城':'0011553', '悅桂冠':'0006926', '經貿BOSS':'0011152',
+communitys_sinyi = {'四季紅':'0009238', '文心移動光城':'0011553', '悅桂冠':'0006926', '經貿BOSS':'0011152',
              '東方晶采':'0013605', '風華':'0007150', '風範':'Y001253', '翔譽之心':'0015380',
               '大同明日世界':'G0000194', '長虹菁英':'0019322', '康寧城堡':'0006300', '民權湖觀':'0001143',
-              '夆典百富':'0016097', '湖水裔':'0009710', '清歡':'Y000987', '捷韻LAVIE':'0019289'}
+              '夆典百富':'0016097', '國礎湖水裔':'0009710', '清歡':'Y000987', '捷韻LAVIE':'0019289'}
 startDate_s2 = ['103', '11']
 stopDate_s2 = ['105', '10']
 duration = startDate_s2[0] + startDate_s2[1] + '_' + stopDate_s2[0] + stopDate_s2[1]
